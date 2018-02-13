@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<KonnektingDevice xmlns="http://konnekting.de/xml/KonnektingDevice/v0">
+    <Device ManufacturerId="7337" DeviceId="1" Revision="0">
+        <ManufacturerName>Spies-IT KNX Labs</ManufacturerName>
+        <DeviceName>CodeLock Door Controller</DeviceName>
+		
+		<Parameters>
+		
+			<ParameterGroup Name="Command 1" Id="0">
+				<Parameter Id="0" IdName="cmd1_out">
+					<Description>Command 1 Output</Description>
+					<Value Type="uint8" Default="00" Options="00=KNX|01=KNX+Output 1|02=KNX+Output 2|03=KNX+Output 3"/>
+				</Parameter>
+				<Parameter Id="1" IdName="cmd1_out_mode">
+					<Description>Command 1 Output Mode</Description>
+					<Value Type="uint8" Default="01" Options="00=disabled|01=ON|02=OFF|03=TOGGLE|11=ON-PULSE|12=OFF-PULSE|13=TOGGLE-PULSE"/>
+				</Parameter>
+				<Parameter Id="2" IdName="cmd1_out_pulse">
+					<Description>Command 1 Output Pulse Width (x 50ms)</Description>
+					<Value Type="uint8" Default="05" Min="01" Max="64"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Command 2" Id="1">
+				<Parameter Id="3" IdName="cmd2_out">
+					<Description>Command 2 Output</Description>
+					<Value Type="uint8" Default="00" Options="00=KNX|01=KNX+Output 1|02=KNX+Output 2|03=KNX+Output 3"/>
+				</Parameter>
+				<Parameter Id="4" IdName="cmd2_out_mode">
+					<Description>Command 2 Output Mode</Description>
+					<Value Type="uint8" Default="01" Options="00=disabled|01=ON|02=OFF|03=TOGGLE|11=ON-PULSE|12=OFF-PULSE|13=TOGGLE-PULSE"/>
+				</Parameter>
+				<Parameter Id="5" IdName="cmd2_out_pulse">
+					<Description>Command 2 Output Pulse Width (x 50ms)</Description>
+					<Value Type="uint8" Default="05" Min="01" Max="64"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Command 3" Id="2">
+				<Parameter Id="6" IdName="cmd3_out">
+					<Description>Command 3 Output</Description>
+					<Value Type="uint8" Default="00" Options="00=KNX|01=KNX+Output 1|02=KNX+Output 2|03=KNX+Output 3"/>
+				</Parameter>
+				<Parameter Id="7" IdName="cmd3_out_mode">
+					<Description>Command 3 Output Mode</Description>
+					<Value Type="uint8" Default="01" Options="00=disabled|01=ON|02=OFF|03=TOGGLE|11=ON-PULSE|12=OFF-PULSE|13=TOGGLE-PULSE"/>
+				</Parameter>
+				<Parameter Id="8" IdName="cmd3_out_pulse">
+					<Description>Command 3 Output Pulse Width (x 50ms)</Description>
+					<Value Type="uint8" Default="05" Min="01" Max="64"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Command 4" Id="3">
+				<Parameter Id="9" IdName="cmd4_out">
+					<Description>Command 4 Output</Description>
+					<Value Type="uint8" Default="00" />
+				</Parameter>
+				<Parameter Id="10" IdName="cmd4_out_mode">
+					<Description>Command 4 Output Mode</Description>
+					<Value Type="uint8" Default="01" Options="00=disabled|01=ON|02=OFF|03=TOGGLE|11=ON-PULSE|12=OFF-PULSE|13=TOGGLE-PULSE"/>
+				</Parameter>
+				<Parameter Id="11" IdName="cmd4_out_pulse">
+					<Description>Command 4 Output Pulse Width (x 50ms)</Description>
+					<Value Type="uint8" Default="05" Min="01" Max="64"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Command 5" Id="4">
+				<Parameter Id="9" IdName="cmd5_out">
+					<Description>Command 5 Output</Description>
+					<Value Type="uint8" Default="00"/>
+				</Parameter>
+				<Parameter Id="10" IdName="cmd5_out_mode">
+					<Description>Command 5 Output Mode</Description>
+					<Value Type="uint8" Default="01" Options="00=disabled|01=ON|02=OFF|03=TOGGLE|11=ON-PULSE|12=OFF-PULSE|13=TOGGLE-PULSE"/>
+				</Parameter>
+				<Parameter Id="11" IdName="cmd5_out_pulse">
+					<Description>Command 5 Output Pulse Width (x 50ms)</Description>
+					<Value Type="uint8" Default="05" Min="01" Max="64"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Door" Id="5">
+				<Parameter Id="12" IdName="door_onclose">
+					<Description>On-Close</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5"/>
+				</Parameter>
+				<Parameter Id="13" IdName="door_onclose_delay">
+					<Description>On-Close delay (x 1s)</Description>
+					<Value Type="uint8" Default="00"/>
+				</Parameter>
+			</ParameterGroup>
+			
+		</Parameters>
+		
+        <CommObjects>
+			<!-- sends paramter-defined reaction when Command 1 is triggerd -->
+            <CommObject Id="0" IdName="cmd1_out">
+                <Name>Command 1</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- executes Command 1 -->
+            <CommObject Id="1" IdName="cmd1_trig">
+                <Name>Command 1</Name>
+                <Function>Ext. Trigger</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- sends paramter-defined reaction when Command 2 is triggerd -->
+            <CommObject Id="2" IdName="cmd2_out">
+                <Name>Command 2</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- executes Command 2 -->
+            <CommObject Id="3" IdName="cmd2_trig">
+                <Name>Command 2</Name>
+                <Function>Ext. Trigger</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- sends paramter-defined reaction when Command 3 is triggerd -->
+            <CommObject Id="4" IdName="cmd3_out">
+                <Name>Command 3</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- executes Command 3 -->
+            <CommObject Id="5" IdName="cmd3_trig">
+                <Name>Command 3</Name>
+                <Function>Ext. Trigger</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- sends paramter-defined reaction when Command 4 is triggerd -->
+            <CommObject Id="6" IdName="cmd4_out">
+                <Name>Command 4</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- executes Command 4 -->
+            <CommObject Id="7" IdName="cmd4_trig">
+                <Name>Command 4</Name>
+                <Function>Ext. Trigger</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- sends paramter-defined reaction when Command 5 is triggerd -->
+            <CommObject Id="8" IdName="cmd5_out">
+                <Name>Command 5</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- executes Command 5 -->
+            <CommObject Id="9" IdName="cmd5_trig">
+                <Name>Command 5</Name>
+                <Function>Ext. Trigger</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- direct access to output 1 read&write-->
+			<CommObject Id="10" IdName="out1">
+                <Name>Output 1</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- direct access to output 2 read&write-->
+			<CommObject Id="11" IdName="out2">
+                <Name>Output 2</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<!-- direct access to output 3 read&write-->
+			<CommObject Id="12" IdName="out3">
+                <Name>Output 3</Name>
+                <Function>Switch</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			
+			<!-- input code over KNX -->
+			<CommObject Id="13" IdName="code_input">
+                <Name>General</Name>
+                <Function>Ext. Code Input</Function>
+                <DataPointType>16.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- sends presed key -->
+			<CommObject Id="14" IdName="key_output">
+                <Name>General</Name>
+                <Function>Pressed Key</Function>
+                <DataPointType>4.001</DataPointType>
+                <Flags>36</Flags> <!-- K__Ü_ -->
+            </CommObject>
+			
+			<!-- sends inserted code on match, error or timeout -->
+			<CommObject Id="15" IdName="code_output">
+                <Name>General</Name>
+                <Function>Inserted Code</Function>
+                <DataPointType>16.001</DataPointType>
+                <Flags>36</Flags> <!-- K__Ü_ -->
+            </CommObject>
+			
+			
+			<!-- input for reed contact -->
+			<CommObject Id="16" IdName="door_input">
+                <Name>Door</Name>
+                <Function>Closed</Function>
+                <DataPointType>1.009</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+		</CommObjects>
+	</Device>
+</KonnektingDevice>
