@@ -5,6 +5,8 @@
 
 #include <Key.h>
 #include <Keypad.h>
+#include "codelock.h"
+#include "config.h"
 
 // ################################################
 // ### DEBUG CONFIGURATION
