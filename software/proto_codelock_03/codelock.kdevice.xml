@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<KonnektingDevice xmlns="http://konnekting.de/xml/KonnektingDevice/v0">
+    <Device ManufacturerId="7337" DeviceId="20" Revision="0">
+        <ManufacturerName>Spies-IT KNX Labs</ManufacturerName>
+        <DeviceName>CodeLock Door Controller</DeviceName>
+		
+		<Parameters>
+			
+			<ParameterGroup Name="General" Id="0">
+				<Parameter Id="0" IdName="device_mode">
+					<Description>Device Mode</Description>
+					<Value Type="uint8" Default="02" Options="01=Codelock|03=Motorlock|02=Codelock+Motorlock"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Codelock" Id="1">
+				<Parameter Id="1" IdName="code">
+					<Description>Code (6 digits 0-9, when less than 6 digits leading 0 will be added)</Description>
+					<Value Type="uint32" Default="00000000" Min="00000000" Max="000F423F"/>
+				</Parameter>
+				<Parameter Id="2" IdName="default_cmd">
+					<Description>Default Command </Description>
+					<Value Type="uint8" Default="00" Min="00" Max="0A"/>
+				</Parameter>
+				<Parameter Id="3" IdName="cmd0_out_mode">
+					<Description>Command 0 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="4" IdName="cmd1_out_mode">
+					<Description>Command 1 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="5" IdName="cmd2_out_mode">
+					<Description>Command 2 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="6" IdName="cmd3_out_mode">
+					<Description>Command 3 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="7" IdName="cmd4_out_mode">
+					<Description>Command 4 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="8" IdName="cmd5_out_mode">
+					<Description>Command 5 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="9" IdName="cmd6_out_mode">
+					<Description>Command 6 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="10" IdName="cmd7_out_mode">
+					<Description>Command 7 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="11" IdName="cmd8_out_mode">
+					<Description>Command 8 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+				<Parameter Id="12" IdName="cmd9_out_mode">
+					<Description>Command 9 Output Mode</Description>
+					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
+				</Parameter>
+			</ParameterGroup>
+			
+			<ParameterGroup Name="Motorlock" Id="2">
+				<Parameter Id="13" IdName="motorlock_onclose">
+					<Description>Lock Door when closed (0=disabled, 1..255 x 0.1s)</Description>
+					<Value Type="uint8" Default="00"/>
+				</Parameter>
+				<Parameter Id="14" IdName="motorlock_open_cmd">
+					<Description>Codelock Command used for Open Motorlock</Description>
+					<Value Type="uint8" Default="00" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
+				</Parameter>
+				<Parameter Id="15" IdName="motorlock_lock_cmd">
+					<Description>Codelock Command used for Lock Motorlock</Description>
+					<Value Type="uint8" Default="0A" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
+				</Parameter>
+				<Parameter Id="16" IdName="motorlock_unlock_cmd">
+					<Description>Codelock Command used for Unlock Motorlock</Description>
+					<Value Type="uint8" Default="0A" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
+				</Parameter>
+			</ParameterGroup>
+			
+		</Parameters>
+		
+        <CommObjects>
+			<!-- sends paramter-defined reaction when Command 1 is triggerd -->
+            <CommObject Id="0" IdName="cmd0_out">
+                <Name>Command 0</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="1" IdName="cmd1_out">
+                <Name>Command 1</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="2" IdName="cmd2_out">
+                <Name>Command 2</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="3" IdName="cmd3_out">
+                <Name>Command 3</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="4" IdName="cmd4_out">
+                <Name>Command 4</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="5" IdName="cmd5_out">
+                <Name>Command 5</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="6" IdName="cmd6_out">
+                <Name>Command 6</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="7" IdName="cmd7_out">
+                <Name>Command 7</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="8" IdName="cmd8_out">
+                <Name>Command 8</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			<CommObject Id="9" IdName="cmd9_out">
+                <Name>Command 9</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>62</Flags> <!-- KLSÜA -->
+            </CommObject>
+			
+			<!-- sends 1 when wrong code is inserted -->
+			<CommObject Id="10" IdName="cmd_wrong">
+                <Name>Wrong Code inserted</Name>
+                <Function>Codelock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>36</Flags> <!-- K__Ü_ -->
+            </CommObject>
+			
+			<!-- sends 0-9 when code is right, otherwise FF -->
+			<CommObject Id="11" IdName="cmd_all">
+                <Name>Inserted Code</Name>
+                <Function>Codelock</Function>
+                <DataPointType>5.010</DataPointType>
+                <Flags>36</Flags> <!-- K__Ü_ -->
+            </CommObject>
+			
+			<!-- sends every pressed key directly to the bus -->
+			<CommObject Id="12" IdName="key_output">
+                <Name>Pressed Key</Name>
+                <Function>Codelock</Function>
+                <DataPointType>4.001</DataPointType>
+                <Flags>36</Flags> <!-- K__Ü_ -->
+            </CommObject>
+					
+			<!-- input for openening motorlock -->
+			<CommObject Id="13" IdName="lock_open">
+                <Name>Open</Name>
+                <Function>Motorlock</Function>
+                <DataPointType>1.001</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- input for lock (1) / unlock (0) motorlock -->
+			<CommObject Id="14" IdName="lock_unlock">
+                <Name>Lock/Unlock</Name>
+                <Function>Motorlock</Function>
+                <DataPointType>1.009</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<!-- input for reed contact -->
+			<CommObject Id="15" IdName="door_input">
+                <Name>Door Closed</Name>
+                <Function>Motorlock</Function>
+                <DataPointType>1.009</DataPointType>
+                <Flags>40</Flags> <!-- K_S__ -->
+            </CommObject>
+			
+			<CommObject Id="16" IdName="error_code">
+                <Name>ErrorCode</Name>
+                <Function>Error</Function>
+                <DataPointType>12.001</DataPointType>
+                <Flags>52</Flags> <!-- KLÜ -->
+            </CommObject>
+			
+		</CommObjects>
+		
+		<Dependencies>
+			<ParameterDependency ParamId="14" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="15" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="16" Test="ne" TestParamId="0" TestValue="03"/>
+            <ParameterGroupDependency ParamGroupId="1" Test="le" TestParamId="0" TestValue="02"/>
+			<ParameterGroupDependency ParamGroupId="2" Test="ge" TestParamId="0" TestValue="02"/>
+			
+			<CommObjectDependency CommObjId="0" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="1" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="2" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="3" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="4" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="5" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="6" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="7" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="8" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="9" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="10" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="11" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="12" Test="le" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="13" Test="ge" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="14" Test="ge" TestParamId="0" TestValue="02"/>
+			<CommObjectDependency CommObjId="15" Test="ge" TestParamId="0" TestValue="02"/>
+
+        </Dependencies>
+		
+	</Device>
+</KonnektingDevice>
