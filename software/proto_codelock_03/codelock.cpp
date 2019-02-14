@@ -1,4 +1,5 @@
 #include "codelock.h"
+#include "config.h"
 
 Codelock::Codelock(Keypad *a_keypad)
 {
@@ -99,7 +100,7 @@ void Codelock::DoState1()
 	{
 		GoToState2();
 	}
-	else if(keypresstimer == 0 || code.length() == MAX_CODE_LENGTH)
+	else if(keypresstimer == 0 || code.length() == CODE_LENGTH)
 	{
 		GoToState0();
 	}
@@ -134,14 +135,36 @@ void Codelock::DoState2()
 
 bool Codelock::IsValidCode()
 {
-  if(code.substring(2,3) = "#")
+  //ToDo
+  unsigned long param_code = 0;
+  unsigned long loc_insertedcode = 0;
+  if(code.length() == CODE_LENGTH+2)
   {
-    //explicit command
+    if(code.charAt(0) >= '0' && code.charAt(0) <= '9' && code.charAt(1) == '#')
+    {
+      code = code.substring(2,CODE_LENGTH+1);
+    }
+    else
+    {
+      return false;
+    }
   }
-  else
+  
+  if(code.length() == CODE_LENGTH)
   {
-    //default command
+    for(int i=0;i<CODE_LENGTH;i++)
+    {
+      char c = code.charAt(CODE_LENGTH);
+      if(c >= '0' && c <= '9')
+      {
+        c = c - '0';
+        loc_insertedcode += c * (10^(CODE_LENGTH-1-i));
+      }
+    }
+    if(loc_insertedcode == param_code)
+      return true;
   }
+  return false;
 }
 
 void Codelock::ExecuteCode()

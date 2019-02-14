@@ -1,3 +1,13 @@
+/*
+
+ToDo:
+//measeure keypad.getkey()
+
+*/
+
+
+
+
 #include <KonnektingDevice.h>
 // include device related configuration code, created by "KONNEKTING CodeGenerator"
 #include "kdevice_CodeLock_Door_Controller.h"
@@ -41,6 +51,13 @@ byte rowPins[rows] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
 byte colPins[cols] = {A5, A4, A3}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
+
+
+unsigned short param_device_mode; 
+unsigned long param_code;
+unsigned short param_default_cmd;
+unsigned short param_cmd_out_mode[10];
+
 // ################################################
 // ### KONNEKTING Configuration
 // ################################################
@@ -49,29 +66,28 @@ Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
 
 //FlashStorage
-int readMemory(int index) {
+int readMemory(int index)
+{
     Debug.println(F("FLASH read on index %d"),index);
     return EEPROM.read(index);
 }
-
-void writeMemory(int index, int val) {
+void writeMemory(int index, int val)
+{
     Debug.println(F("FLASH write value %d on index %d"),val, index);
     EEPROM.write(index, val);
 }
-
-void updateMemory(int index, int val) {
+void updateMemory(int index, int val)
+{
     Debug.println(F("FLASH update"));
     if (EEPROM.read(index) != val) {
         EEPROM.write(index, val);
     }
 }
-
-void commitMemory() {
+void commitMemory()
+{
     Debug.println(F("FLASH commit"));
     EEPROM.commit();
 }
-
-
 
 // ################################################
 // ### KNX EVENT CALLBACK
@@ -81,7 +97,15 @@ void knxEvents(byte index)
 {
   switch (index)
   {
-    case 0:
+    case COMOBJ_lock_open:
+    {
+    }
+    break;
+    case COMOBJ_lock_unlock:
+    {
+    }
+    break;
+    case COMOBJ_door_input:
     {
     }
     break;
@@ -105,32 +129,37 @@ void keypadEvent(KeypadEvent key)
 
 void setup()
 {
-    // debug related stuff
-#ifdef KDEBUG
+  // debug related stuff
+  #ifdef KDEBUG
+  // Start debug serial with 9600 bauds
+  DEBUGSERIAL.begin(9600);
 
-    // Start debug serial with 9600 bauds
-    DEBUGSERIAL.begin(9600);
+  // make debug serial port known to debug class
+  // Means: KONNEKTING will sue the same serial port for console debugging
+  Debug.setPrintStream(&DEBUGSERIAL);
+  #endif
 
-    // make debug serial port known to debug class
-    // Means: KONNEKTING will sue the same serial port for console debugging
-    Debug.setPrintStream(&DEBUGSERIAL);
-#endif
+  Konnekting.setMemoryReadFunc(&readMemory);
+  Konnekting.setMemoryWriteFunc(&writeMemory);
+  Konnekting.setMemoryUpdateFunc(&updateMemory);
+  Konnekting.setMemoryCommitFunc(&commitMemory);
 
-    Konnekting.setMemoryReadFunc(&readMemory);
-    Konnekting.setMemoryWriteFunc(&writeMemory);
-    Konnekting.setMemoryUpdateFunc(&updateMemory);
-    Konnekting.setMemoryCommitFunc(&commitMemory);
+  pinMode(A0, INPUT_PULLUP);
 
-    pinMode(A0, INPUT_PULLUP);
-
-    // Initialize KNX enabled Arduino Board
-    Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
-    if (!Konnekting.isFactorySetting())
-    {
-      timeslice_setup();
-      keypad.addEventListener(keypadEvent); //add an event listener for this keypad
-    }
-    Debug.println(F("Setup is ready. go to loop..."));
+  // Initialize KNX enabled Arduino Board
+  Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
+  if (!Konnekting.isFactorySetting())
+  {
+    param_device_mode = (unsigned short)Konnekting.getUINT8Param(PARAM_device_mode);
+    param_code = (unsigned long)Konnekting.getUINT32Param(PARAM_code);
+    param_default_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_default_cmd);
+    for(int i=0;i<10;i++)
+      param_cmd_out_mode[i] = (unsigned short)Konnekting.getUINT8Param(PARAM_cmd0_out_mode+i);
+    
+    timeslice_setup();
+    keypad.addEventListener(keypadEvent); //add an event listener for this keypad
+  }
+  Debug.println(F("Setup is ready. go to loop..."));
 
 }
 
