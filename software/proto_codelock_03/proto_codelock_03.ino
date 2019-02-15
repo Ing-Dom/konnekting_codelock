@@ -124,6 +124,9 @@ void keypadEvent(KeypadEvent key)
     Debug.println(F("keyevent %d"),key);
     #endif
     Knx.write(COMOBJ_key_output, (unsigned short)key);
+    digitalWrite(2, HIGH);
+    delay(100);
+    digitalWrite(2, LOW);
   }   
 }
 
@@ -133,6 +136,7 @@ void setup()
   #ifdef KDEBUG
   // Start debug serial with 9600 bauds
   DEBUGSERIAL.begin(9600);
+  while (!DEBUGSERIAL)
 
   // make debug serial port known to debug class
   // Means: KONNEKTING will sue the same serial port for console debugging
@@ -145,6 +149,7 @@ void setup()
   Konnekting.setMemoryCommitFunc(&commitMemory);
 
   pinMode(A0, INPUT_PULLUP);
+  pinMode(2, OUTPUT);
 
   // Initialize KNX enabled Arduino Board
   Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
