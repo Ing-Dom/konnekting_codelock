@@ -52,7 +52,7 @@ void Codelock::GoToState0()
 	switch(state)
 	{
 		case 1:
-			beep(3);
+			//beep(3);
 		break;
 		
 		case 2:
@@ -80,12 +80,12 @@ void Codelock::GoToState1()
 	{
 		case 0:
 			code = String(myKey);
-			beep(0);
+			//beep(0);
 			keypresstimer = KEYPRESSTIMEOUT;
 		break;
 		case 1:
 			code += myKey;
-			beep(0);
+			//beep(0);
 			keypresstimer = KEYPRESSTIMEOUT;
 		break;
 	}	
@@ -120,7 +120,7 @@ void Codelock::GoToState2()
 	switch(state)
 	{
 		case 1:
-			beep(2);
+			//beep(2);
 		break;
 	}	
 	
@@ -171,11 +171,7 @@ void Codelock::ExecuteCode()
 {
 	
 }
-	
-void Codelock::beep(int beepcode)
-{
-	
-}
+
 
 char Codelock::GetKey()
 {

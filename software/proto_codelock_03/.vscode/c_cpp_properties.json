@@ -13,6 +13,21 @@
             "compilerPath": "C:\\StrawberyPerl\\c\\bin\\gcc.exe",
             "cStandard": "c11",
             "cppStandard": "c++17"
+        },
+        {
+            "name": "Work",
+            "includePath": [
+                "C:\\Users\\e09sped0\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\samd\\1.2.9\\**",
+                "D:\\syncplicity\\e09sped0\\Documents\\Arduino\\libraries\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Users\\e09sped0\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\samd\\1.2.9\\cores\\arduino\\Arduino.h"
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "compilerPath": "C:\\StrawberyPerl\\c\\bin\\gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "C_Cpp.clang_format_style": "{IndentWidth: 2}"
         }
     ],
     "version": 4

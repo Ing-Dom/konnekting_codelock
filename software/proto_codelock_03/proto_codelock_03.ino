@@ -1,7 +1,6 @@
 /*
 
 ToDo:
-//measeure keypad.getkey()
 
 */
 
@@ -17,6 +16,7 @@ ToDo:
 #include "codelock.h"
 #include "config.h"
 #include "timeslice.h"
+#include "beep.h"
 
 // ################################################
 // ### DEBUG CONFIGURATION
@@ -51,7 +51,7 @@ byte rowPins[rows] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
 byte colPins[cols] = {A5, A4, A3}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
-
+Beep beep = Beep(A2);
 
 unsigned short param_device_mode; 
 unsigned long param_code;
@@ -124,9 +124,10 @@ void keypadEvent(KeypadEvent key)
     Debug.println(F("keyevent %d"),key);
     #endif
     Knx.write(COMOBJ_key_output, (unsigned short)key);
-    digitalWrite(2, HIGH);
-    delay(100);
-    digitalWrite(2, LOW);
+    if(key == '#')
+      beep.DoubleBeep(500,300,500);
+    else
+      beep.SingleBeep(200);
   }   
 }
 
@@ -148,8 +149,10 @@ void setup()
   Konnekting.setMemoryUpdateFunc(&updateMemory);
   Konnekting.setMemoryCommitFunc(&commitMemory);
 
+  //ToDo Debug only
   pinMode(A0, INPUT_PULLUP);
-  pinMode(2, OUTPUT);
+
+  beep.Setup();
 
   // Initialize KNX enabled Arduino Board
   Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
@@ -174,15 +177,19 @@ void loop()
     
     if (Konnekting.isReadyForApplication())
     {
-      keypad.getKey();
       timeslice_scheduler();
     }
 }
 
 void T1()
-{}
+{
+
+}
 void T2()
-{}
+{
+  keypad.getKey();
+  beep.Cyclic();
+}
 void T3()
 {}
 void T4()

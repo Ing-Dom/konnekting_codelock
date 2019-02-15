@@ -32,8 +32,6 @@ class Codelock
 	private: bool IsValidCode();
 
 	private: void ExecuteCode();
-	
-	private: void beep(int beepcode);
 
  private: char GetKey();
 };
