@@ -1,3 +1,5 @@
+#pragma once
+
 // Stuff for CycleControl
 
 #include <Arduino.h>

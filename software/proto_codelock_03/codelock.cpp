@@ -1,148 +1,65 @@
 #include "codelock.h"
-#include "config.h"
 
-Codelock::Codelock(Keypad *a_keypad)
+Codelock::Codelock(Beep *a_beeper, unsigned long param_code)
 {
-	m_keypad = a_keypad;
+	m_beeper = a_beeper;
+	m_param_code = param_code;
+}
+
+void Codelock::addEventListener(void (*listener)(int))
+{
+	cmdEventListener = listener;
 }
 
 void Codelock::Cyclic()
 {
-	//timerhandling
-	current_ms = millis();
-	
-	if(current_ms >= last_ms)
-	{
-		elapsed_ms = current_ms - last_ms;
-	}
-	else
-	{
-		//overflow of ms counter has happend, handle this
-		elapsed_ms = MAX_UINT - last_ms + current_ms;
-	}
-	
-	if(keypresstimer > 0)
-	{
-		if(keypresstimer > elapsed_ms)
-			keypresstimer = keypresstimer - elapsed_ms;
-		else
-			keypresstimer = 0;
-	}
-	
-	
-	last_ms = current_ms;
-	
-	
-	switch(state)
-	{
-    case 0:
-     DoState0();
-     break;
-    case 1:
-     DoState1();
-     break;
-    case 2:
-     DoState2();
-     break;
-	}
+
 }
 
-void Codelock::GoToState0()
+void Codelock::KeyPress(char key)
 {
-	switch(state)
+	Debug.println(F("Codelock.KeyPress %d"),key);
+	int oldstate = m_state;
+	if(m_state == 0 || m_state == 1)
 	{
-		case 1:
-			//beep(3);
-		break;
-		
-		case 2:
-			//ExecuteCode(code); //ToDo
-		break;
-	}	
-	
-	state = 1;
-}
-
-
-void Codelock::DoState0()
-{
-	myKey = GetKey();
-	if(myKey != NO_KEY)
-	{
-		GoToState1();
-	}
-}
-
-
-void Codelock::GoToState1()
-{
-	switch(state)
-	{
-		case 0:
-			code = String(myKey);
-			//beep(0);
-			keypresstimer = KEYPRESSTIMEOUT;
-		break;
-		case 1:
-			code += myKey;
-			//beep(0);
-			keypresstimer = KEYPRESSTIMEOUT;
-		break;
-	}	
-	
-	state = 1;
-}
-
-
-void Codelock::DoState1()
-{
-	if(IsValidCode())
-	{
-		GoToState2();
-	}
-	else if(keypresstimer == 0 || code.length() == CODE_LENGTH)
-	{
-		GoToState0();
-	}
-	else
-	{	
-		myKey = GetKey();
-		if(myKey != NO_KEY)
+		m_code += key;
+		if(IsValidCode())
 		{
-			GoToState1();
+			m_beeper->SingleBeep(1000);
+			ExecuteCode();
+			m_state = 0;
+			m_code = "";
+			Debug.println(F("codelock %d=>%d"),oldstate,m_state);
+		}
+		else
+		{
+			if(m_code.length() >= CODE_LENGTH + 2)
+			{
+				m_beeper->DoubleBeep(500,200,500);
+				m_state = 0;
+				m_code = "";
+				Debug.println(F("codelock %d=>%d"),oldstate,m_state);
+			}
+			else
+			{
+				m_beeper->SingleBeep(50);
+				m_state = 1;
+				Debug.println(F("codelock %d=>%d"),oldstate,m_state);
+			}
 		}
 	}
 }
 
 
-void Codelock::GoToState2()
-{
-	switch(state)
-	{
-		case 1:
-			//beep(2);
-		break;
-	}	
-	
-	state = 1;
-}
-
-
-void Codelock::DoState2()
-{
-	GoToState0();
-}
-
 bool Codelock::IsValidCode()
 {
   //ToDo
-  unsigned long param_code = 0;
   unsigned long loc_insertedcode = 0;
-  if(code.length() == CODE_LENGTH+2)
+  if(m_code.length() == CODE_LENGTH+2)
   {
-    if(code.charAt(0) >= '0' && code.charAt(0) <= '9' && code.charAt(1) == '#')
+    if(m_code.charAt(0) >= '0' && m_code.charAt(0) <= '9' && m_code.charAt(1) == '#')
     {
-      code = code.substring(2,CODE_LENGTH+1);
+      m_code = m_code.substring(2,CODE_LENGTH+1);
     }
     else
     {
@@ -150,18 +67,18 @@ bool Codelock::IsValidCode()
     }
   }
   
-  if(code.length() == CODE_LENGTH)
+  if(m_code.length() == CODE_LENGTH)
   {
+		Debug.println(F("IsValidCode code: %d"),m_code.toInt());
     for(int i=0;i<CODE_LENGTH;i++)
     {
-      char c = code.charAt(CODE_LENGTH);
-      if(c >= '0' && c <= '9')
-      {
-        c = c - '0';
-        loc_insertedcode += c * (10^(CODE_LENGTH-1-i));
-      }
+      char c = m_code.charAt(i);
+      if(c <= '0' && c >= '9')
+    		return false;
     }
-    if(loc_insertedcode == param_code)
+		loc_insertedcode = m_code.toInt();
+		Debug.println(F("IsValidCode6 %d %d"),loc_insertedcode,m_param_code);
+    if(loc_insertedcode == m_param_code)
       return true;
   }
   return false;
@@ -169,11 +86,17 @@ bool Codelock::IsValidCode()
 
 void Codelock::ExecuteCode()
 {
-	
+	Debug.println("Execute Code");
+	if(m_code.charAt(1) == '#')
+	{
+		if(cmdEventListener!=NULL)
+		{
+			cmdEventListener(m_code.charAt(0) - '0');
+		}
+	}
+	else
+	{
+		cmdEventListener(10);
+	}
 }
 
-
-char Codelock::GetKey()
-{
-  return m_keypad->getKey();
-}

@@ -1,3 +1,5 @@
+#pragma once
+
 #define MANUFACTURER_ID 7337
 #define DEVICE_ID 20
 #define REVISION 0

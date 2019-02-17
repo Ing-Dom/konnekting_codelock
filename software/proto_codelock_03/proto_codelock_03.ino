@@ -10,7 +10,8 @@ ToDo:
 #include <KonnektingDevice.h>
 // include device related configuration code, created by "KONNEKTING CodeGenerator"
 #include "kdevice_CodeLock_Door_Controller.h"
-#include <FlashAsEEPROM.h>
+//#include <FlashAsEEPROM.h>
+#include "FileAsEEPROM.h"
 #include <Key.h>
 #include <Keypad.h>
 #include "codelock.h"
@@ -35,6 +36,7 @@ ToDo:
 #define PROG_LED_PIN 13
 #define PROG_BUTTON_PIN 7
 
+#define BEEP_PIN 2
 
 // ################################################
 // ### Global variables, sketch related
@@ -51,7 +53,8 @@ byte rowPins[rows] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
 byte colPins[cols] = {A5, A4, A3}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
-Beep beep = Beep(A2);
+Beep g_beep = Beep(BEEP_PIN);
+Codelock *g_codelock;
 
 unsigned short param_device_mode; 
 unsigned long param_code;
@@ -69,24 +72,24 @@ unsigned short param_cmd_out_mode[10];
 int readMemory(int index)
 {
     Debug.println(F("FLASH read on index %d"),index);
-    return EEPROM.read(index);
+    return FileEEPROM.read(index);
 }
 void writeMemory(int index, int val)
 {
     Debug.println(F("FLASH write value %d on index %d"),val, index);
-    EEPROM.write(index, val);
+    FileEEPROM.write(index, val);
 }
 void updateMemory(int index, int val)
 {
     Debug.println(F("FLASH update"));
-    if (EEPROM.read(index) != val) {
-        EEPROM.write(index, val);
+    if (FileEEPROM.read(index) != val) {
+        FileEEPROM.write(index, val);
     }
 }
 void commitMemory()
 {
     Debug.println(F("FLASH commit"));
-    EEPROM.commit();
+    FileEEPROM.commit();
 }
 
 // ################################################
@@ -121,14 +124,16 @@ void keypadEvent(KeypadEvent key)
   if(keypad.getState() == PRESSED)
   {
     #ifdef KDEBUG  
-    Debug.println(F("keyevent %d"),key);
+    //Debug.println(F("keyevent %d"),key);
     #endif
     Knx.write(COMOBJ_key_output, (unsigned short)key);
-    if(key == '#')
-      beep.DoubleBeep(500,300,500);
-    else
-      beep.SingleBeep(200);
+    g_codelock->KeyPress(key);
   }   
+}
+
+void codelockEvent(int cmd)
+{
+    Debug.println(F("Execute cmd %d"),cmd);
 }
 
 void setup()
@@ -149,10 +154,8 @@ void setup()
   Konnekting.setMemoryUpdateFunc(&updateMemory);
   Konnekting.setMemoryCommitFunc(&commitMemory);
 
-  //ToDo Debug only
-  pinMode(A0, INPUT_PULLUP);
 
-  beep.Setup();
+  g_beep.Setup();
 
   // Initialize KNX enabled Arduino Board
   Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
@@ -164,8 +167,11 @@ void setup()
     for(int i=0;i<10;i++)
       param_cmd_out_mode[i] = (unsigned short)Konnekting.getUINT8Param(PARAM_cmd0_out_mode+i);
     
+    g_codelock = new Codelock(&g_beep, param_code);
+
     timeslice_setup();
     keypad.addEventListener(keypadEvent); //add an event listener for this keypad
+    g_codelock->addEventListener(codelockEvent);
   }
   Debug.println(F("Setup is ready. go to loop..."));
 
@@ -188,7 +194,7 @@ void T1()
 void T2()
 {
   keypad.getKey();
-  beep.Cyclic();
+  g_beep.Cyclic();
 }
 void T3()
 {}
@@ -197,6 +203,6 @@ void T4()
 }
 void T5()
 {
-  Knx.write(COMOBJ_error_code, digitalRead(A0));
-  Debug.println(F("T5"));
+  Knx.write(COMOBJ_error_code, 0);
+  //Debug.println(F("T5"));
 }
