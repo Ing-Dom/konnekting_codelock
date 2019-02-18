@@ -1,7 +1,10 @@
 /*
 
 ToDo:
-
+Flags XML
+Beep-Codes
+timeouts as params
+codelock as keypad-param 
 */
 
 
@@ -18,6 +21,7 @@ ToDo:
 #include "config.h"
 #include "timeslice.h"
 #include "beep.h"
+#include "motorlock.h"
 
 // ################################################
 // ### DEBUG CONFIGURATION
@@ -38,6 +42,10 @@ ToDo:
 
 #define BEEP_PIN 2
 
+#define OPEN_PIN A0
+#define LOCK_PIN A1
+#define UNLOCK_PIN A2
+
 // ################################################
 // ### Global variables, sketch related
 // ################################################
@@ -54,12 +62,22 @@ byte colPins[cols] = {A5, A4, A3}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
 Beep g_beep = Beep(BEEP_PIN);
+Beep g_open = Beep(OPEN_PIN);
+Beep g_lock = Beep(LOCK_PIN);
+Beep g_unlock = Beep(UNLOCK_PIN);
 Codelock *g_codelock;
+Motorlock *g_motorlock;
+bool g_door_openclose = 0;
+unsigned int g_door_openclose_cntdown = 0;
 
 unsigned short param_device_mode; 
 unsigned long param_code;
 unsigned short param_default_cmd;
 unsigned short param_cmd_out_mode[10];
+unsigned short param_motorlock_onclose;
+unsigned short param_motorlock_open_cmd;
+unsigned short param_motorlock_lock_cmd;
+unsigned short param_motorlock_unlock_cmd;
 
 // ################################################
 // ### KONNEKTING Configuration
@@ -102,14 +120,35 @@ void knxEvents(byte index)
   {
     case COMOBJ_lock_open:
     {
+      if(Knx.read(COMOBJ_lock_open))
+      {
+        g_motorlock->Open();
+      }
     }
     break;
     case COMOBJ_lock_unlock:
     {
+      if(Knx.read(COMOBJ_lock_unlock)) // DPT1.009: 0=Open, 1=Close
+      {
+        g_motorlock->Lock();
+      }
+      else
+      {
+        g_motorlock->Unlock();
+      }
     }
     break;
     case COMOBJ_door_input:
     {
+      //detect rising edge 0->1 Open->Close DPT1.009
+      if(Knx.read(COMOBJ_door_input) != g_door_openclose)
+      {
+        if(!g_door_openclose)
+        {
+          g_door_openclose_cntdown = ((unsigned int)(100 / T3_CYCLETIME)) * param_motorlock_onclose;
+        }
+        g_door_openclose = !g_door_openclose;
+      }
     }
     break;
     default:
@@ -134,6 +173,56 @@ void keypadEvent(KeypadEvent key)
 void codelockEvent(int cmd)
 {
     Debug.println(F("Execute cmd %d"),cmd);
+
+    if(cmd >= 0 && cmd <= 9)
+    {
+      ExecuteCodelockCmd(cmd);
+    }
+    else if(cmd == 10)
+    {
+      ExecuteCodelockCmd(param_default_cmd);
+    }
+    else if(cmd < 0)
+    {
+      Knx.write(COMOBJ_cmd_wrong, 1);
+    }
+}
+
+void ExecuteCodelockCmd(int cmd)
+{
+  if(cmd >= 0 && cmd <= 9)
+  {
+    if(param_cmd_out_mode[cmd] == 1)
+    {
+      Knx.write(COMOBJ_cmd0_out+cmd, 1);
+    }
+    else if(param_cmd_out_mode[cmd] == 2)
+    {
+      Knx.write(COMOBJ_cmd0_out+cmd, 0);
+    }
+    else if(param_cmd_out_mode[cmd] == 3)
+    {
+      Knx.write(COMOBJ_cmd0_out+cmd, !Knx.read(COMOBJ_cmd0_out+cmd));
+    }
+    Knx.write(COMOBJ_cmd_all, cmd);
+  }
+  if(param_device_mode & 0x02 == 0x02)
+  {
+    //Motorlock enabled in device mode
+
+    if(param_motorlock_open_cmd == cmd)
+    {
+      g_motorlock->Open();
+    }
+    if(param_motorlock_lock_cmd == cmd)
+    {
+      g_motorlock->Lock();
+    }
+    if(param_motorlock_unlock_cmd == cmd)
+    {
+      g_motorlock->Unlock();
+    }
+  }
 }
 
 void setup()
@@ -166,8 +255,13 @@ void setup()
     param_default_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_default_cmd);
     for(int i=0;i<10;i++)
       param_cmd_out_mode[i] = (unsigned short)Konnekting.getUINT8Param(PARAM_cmd0_out_mode+i);
+    param_motorlock_onclose = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_onclose);
+    param_motorlock_open_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_open_cmd);
+    param_motorlock_lock_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_lock_cmd);
+    param_motorlock_unlock_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_unlock_cmd);
     
     g_codelock = new Codelock(&g_beep, param_code);
+    g_motorlock = new Motorlock(&g_open, &g_lock, &g_unlock);
 
     timeslice_setup();
     keypad.addEventListener(keypadEvent); //add an event listener for this keypad
@@ -187,22 +281,35 @@ void loop()
     }
 }
 
-void T1()
+void T1() // 1ms
 {
 
 }
-void T2()
+void T2() // 5ms
 {
   keypad.getKey();
   g_beep.Cyclic();
+  g_open.Cyclic();
+  g_lock.Cyclic();
+  g_unlock.Cyclic();
 }
-void T3()
-{}
-void T4()
+void T3() // 25ms
+{
+  if(g_door_openclose_cntdown > 0)
+  {
+    g_door_openclose_cntdown--;
+    if(g_door_openclose_cntdown == 0)
+    {
+      g_motorlock->Lock();
+    }
+  }
+  g_codelock->Cyclic();
+}
+void T4() // 500ms
 {
 }
-void T5()
+void T5() // 10000ms
 {
-  Knx.write(COMOBJ_error_code, 0);
+  //Knx.write(COMOBJ_error_code, 0);
   //Debug.println(F("T5"));
 }

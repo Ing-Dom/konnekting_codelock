@@ -5,6 +5,8 @@
 #include <Keypad.h>
 #include "beep.h"
 
+#define TICKS_PER_SECOND 40
+
 class Codelock
 {
 	//members
@@ -12,6 +14,9 @@ class Codelock
 	private: String m_code = "";
   private: Beep *m_beeper;
   private: unsigned long m_param_code = 0;
+	private: int m_no_wrong_codes = 0;
+	private: unsigned long m_blocked_cntdown = 0;
+	private: unsigned long m_insert_timeout_cntdown = 0;
 
 	//constructors
 	public: Codelock(Beep *a_beeper, unsigned long param_code);
@@ -29,4 +34,6 @@ class Codelock
 	private: bool IsValidCode();
 
 	private: void ExecuteCode();
+
+	private: void WrongCode();
 };

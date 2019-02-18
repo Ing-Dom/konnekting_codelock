@@ -13,19 +13,41 @@ void Codelock::addEventListener(void (*listener)(int))
 
 void Codelock::Cyclic()
 {
+	//ToDo
+	//when state = 1 and no key has pressed for a while, then goto state 0
+	if(m_insert_timeout_cntdown > 0)
+	{
+	 m_insert_timeout_cntdown--;
+	 if(m_insert_timeout_cntdown == 0)
+	 {
+		 //cntdown reached 0
+		 m_beeper->DoubleBeep(500,200,500); // Error-Beep
+			WrongCode();
+			m_state = 0;
+			m_code = "";
+			Debug.println(F("Timeout keypress"));
+	 }
+	}
 
+	if(m_blocked_cntdown > 0)
+	 m_blocked_cntdown--;
 }
 
 void Codelock::KeyPress(char key)
 {
 	Debug.println(F("Codelock.KeyPress %d"),key);
 	int oldstate = m_state;
-	if(m_state == 0 || m_state == 1)
+	if(m_blocked_cntdown > 0)
+	{
+		m_beeper->DoubleBeep(500,200,500); // Error-Beep
+	}
+	else if(m_state == 0 || m_state == 1)
 	{
 		m_code += key;
+		m_insert_timeout_cntdown = TICKS_PER_SECOND * 5; // 5 sec
 		if(IsValidCode())
 		{
-			m_beeper->SingleBeep(1000);
+			m_beeper->SingleBeep(1000); // ValidCode-Beep
 			ExecuteCode();
 			m_state = 0;
 			m_code = "";
@@ -35,14 +57,15 @@ void Codelock::KeyPress(char key)
 		{
 			if(m_code.length() >= CODE_LENGTH + 2)
 			{
-				m_beeper->DoubleBeep(500,200,500);
+				m_beeper->DoubleBeep(500,200,500); // Error-Beep
+				WrongCode();
 				m_state = 0;
 				m_code = "";
 				Debug.println(F("codelock %d=>%d"),oldstate,m_state);
 			}
 			else
 			{
-				m_beeper->SingleBeep(50);
+				m_beeper->SingleBeep(50); // Validkeypressed-Beep
 				m_state = 1;
 				Debug.println(F("codelock %d=>%d"),oldstate,m_state);
 			}
@@ -53,7 +76,6 @@ void Codelock::KeyPress(char key)
 
 bool Codelock::IsValidCode()
 {
-  //ToDo
   unsigned long loc_insertedcode = 0;
   if(m_code.length() == CODE_LENGTH+2)
   {
@@ -96,7 +118,26 @@ void Codelock::ExecuteCode()
 	}
 	else
 	{
-		cmdEventListener(10);
+		if(cmdEventListener!=NULL)
+		{
+			cmdEventListener(10);
+		}
 	}
+	m_no_wrong_codes = 0;
+}
+
+void Codelock::WrongCode()
+{
+	Debug.println("Wrong Code");
+	if(cmdEventListener!=NULL)
+	{
+		cmdEventListener(-1);
+	}
+	m_no_wrong_codes++;
+
+	if(m_no_wrong_codes > 5)
+		m_blocked_cntdown = TICKS_PER_SECOND * 15 * 60; // 15min
+	else if(m_no_wrong_codes > 3)
+		m_blocked_cntdown = TICKS_PER_SECOND * 10; // 10sec
 }
 
