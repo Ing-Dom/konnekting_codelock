@@ -62,22 +62,42 @@
 					<Description>Command 9 Output Mode</Description>
 					<Value Type="uint8" Default="00" Options="00=disabled|01=ON|02=OFF|03=TOGGLE"/>
 				</Parameter>
+				<Parameter Id="13" IdName="codelock_wrongcode_timeout1_no">
+					<Description>Wrong Code Timeout 1 No. of wrong codes (0: disabled)</Description>
+					<Value Type="uint8" Default="03" Min="00" Max="10"/>
+				</Parameter>
+				<Parameter Id="14" IdName="codelock_wrongcode_timeout1_time">
+					<Description>Wrong Code Timeout 1 duration in seconds</Description>
+					<Value Type="uint8" Default="10" Min="01" Max="255"/>
+				</Parameter>
+				<Parameter Id="15" IdName="codelock_wrongcode_timeout2_no">
+					<Description>Wrong Code Timeout 2 No. of wrong codes (0: disabled, must be greater than Timeout 1)</Description>
+					<Value Type="uint8" Default="05" Min="00" Max="20"/>
+				</Parameter>
+				<Parameter Id="16" IdName="codelock_wrongcode_timeout2_time">
+					<Description>Wrong Code Timeout 2 duration in seconds</Description>
+					<Value Type="uint8" Default="10" Min="01" Max="255"/>
+				</Parameter>
+				<Parameter Id="17" IdName="codelock_keypress_timeout_time">
+					<Description>Reset Code after not pressing any key for x seconds (0: disabled)</Description>
+					<Value Type="uint8" Default="5"/>
+				</Parameter>
 			</ParameterGroup>
 			
 			<ParameterGroup Name="Motorlock" Id="2">
-				<Parameter Id="13" IdName="motorlock_onclose">
+				<Parameter Id="18" IdName="motorlock_onclose">
 					<Description>Lock Door when closed (0=disabled, 1..255 x 0.1s)</Description>
 					<Value Type="uint8" Default="00"/>
 				</Parameter>
-				<Parameter Id="14" IdName="motorlock_open_cmd">
+				<Parameter Id="19" IdName="motorlock_open_cmd">
 					<Description>Codelock Command used for Open Motorlock</Description>
 					<Value Type="uint8" Default="00" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
 				</Parameter>
-				<Parameter Id="15" IdName="motorlock_lock_cmd">
+				<Parameter Id="20" IdName="motorlock_lock_cmd">
 					<Description>Codelock Command used for Lock Motorlock</Description>
 					<Value Type="uint8" Default="0A" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
 				</Parameter>
-				<Parameter Id="16" IdName="motorlock_unlock_cmd">
+				<Parameter Id="21" IdName="motorlock_unlock_cmd">
 					<Description>Codelock Command used for Unlock Motorlock</Description>
 					<Value Type="uint8" Default="0A" Options="00=Command 0|01=Command 1|02=Command 2|03=Command 3|04=Command 4|05=Command 5|06=Command 6|07=Command 7|08=Command 8|09=Command 9|0A=None"/>
 				</Parameter>
@@ -206,9 +226,9 @@
 		</CommObjects>
 		
 		<Dependencies>
-			<ParameterDependency ParamId="14" Test="ne" TestParamId="0" TestValue="03"/>
-			<ParameterDependency ParamId="15" Test="ne" TestParamId="0" TestValue="03"/>
-			<ParameterDependency ParamId="16" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="19" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="20" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="21" Test="ne" TestParamId="0" TestValue="03"/>
             <ParameterGroupDependency ParamGroupId="1" Test="le" TestParamId="0" TestValue="02"/>
 			<ParameterGroupDependency ParamGroupId="2" Test="ge" TestParamId="0" TestValue="02"/>
 			
