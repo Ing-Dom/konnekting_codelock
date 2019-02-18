@@ -9,7 +9,7 @@
 			<ParameterGroup Name="General" Id="0">
 				<Parameter Id="0" IdName="device_mode">
 					<Description>Device Mode</Description>
-					<Value Type="uint8" Default="02" Options="01=Codelock|03=Motorlock|02=Codelock+Motorlock"/>
+				        <Value Type="uint8" Default="02" Options="01=Codelock|03=Motorlock|02=Codelock+Motorlock"/>
 				</Parameter>
 			</ParameterGroup>
 			

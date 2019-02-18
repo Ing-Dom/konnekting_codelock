@@ -79,19 +79,23 @@ bool Codelock::IsValidCode()
   unsigned long loc_insertedcode = 0;
   if(m_code.length() == CODE_LENGTH+2)
   {
+		Debug.println(F("IsValidCode8"));
     if(m_code.charAt(0) >= '0' && m_code.charAt(0) <= '9' && m_code.charAt(1) == '#')
     {
-      m_code = m_code.substring(2,CODE_LENGTH+1);
+			m_cmdno = m_code.charAt(0);
+      m_code = m_code.substring(2,CODE_LENGTH+3);
+			Debug.println(F("IsValidCode8 ok"));
     }
     else
     {
+			Debug.println(F("IsValidCode8 false"));
       return false;
     }
   }
   
   if(m_code.length() == CODE_LENGTH)
   {
-		Debug.println(F("IsValidCode code: %d"),m_code.toInt());
+		Debug.println(F("IsValidCode codeToInt: %d"),m_code.toInt());
     for(int i=0;i<CODE_LENGTH;i++)
     {
       char c = m_code.charAt(i);
@@ -109,11 +113,11 @@ bool Codelock::IsValidCode()
 void Codelock::ExecuteCode()
 {
 	Debug.println("Execute Code");
-	if(m_code.charAt(1) == '#')
+	if(m_cmdno > 0)
 	{
 		if(cmdEventListener!=NULL)
 		{
-			cmdEventListener(m_code.charAt(0) - '0');
+			cmdEventListener(m_cmdno - '0');
 		}
 	}
 	else
@@ -124,6 +128,8 @@ void Codelock::ExecuteCode()
 		}
 	}
 	m_no_wrong_codes = 0;
+	m_insert_timeout_cntdown = 0;
+	m_cmdno = 0;
 }
 
 void Codelock::WrongCode()
@@ -134,6 +140,7 @@ void Codelock::WrongCode()
 		cmdEventListener(-1);
 	}
 	m_no_wrong_codes++;
+	m_insert_timeout_cntdown = 0;
 
 	if(m_no_wrong_codes > 5)
 		m_blocked_cntdown = TICKS_PER_SECOND * 15 * 60; // 15min

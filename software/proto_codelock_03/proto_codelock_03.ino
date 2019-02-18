@@ -206,7 +206,8 @@ void ExecuteCodelockCmd(int cmd)
     }
     Knx.write(COMOBJ_cmd_all, cmd);
   }
-  if(param_device_mode & 0x02 == 0x02)
+  Debug.println(F("ExecuteCodelockCmd dev mode: %d %d %d"),param_device_mode,param_motorlock_open_cmd,cmd);
+  if(param_device_mode == 2)
   {
     //Motorlock enabled in device mode
 

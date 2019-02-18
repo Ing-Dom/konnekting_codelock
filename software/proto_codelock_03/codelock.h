@@ -12,6 +12,7 @@ class Codelock
 	//members
 	private: int m_state = 0;
 	private: String m_code = "";
+	private: char m_cmdno = 0;
   private: Beep *m_beeper;
   private: unsigned long m_param_code = 0;
 	private: int m_no_wrong_codes = 0;
