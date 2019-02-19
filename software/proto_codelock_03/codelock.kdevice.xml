@@ -9,7 +9,7 @@
 			<ParameterGroup Name="General" Id="0">
 				<Parameter Id="0" IdName="device_mode">
 					<Description>Device Mode</Description>
-				        <Value Type="uint8" Default="02" Options="01=Codelock|03=Motorlock|02=Codelock+Motorlock"/>
+				        <Value Type="uint8" Default="02" Options="01=Codelock|03=Motorlock|02=Codelock+Motorlock|00=Keypad"/>
 				</Parameter>
 			</ParameterGroup>
 			
@@ -68,19 +68,19 @@
 				</Parameter>
 				<Parameter Id="14" IdName="codelock_wrongcode_timeout1_time">
 					<Description>Wrong Code Timeout 1 duration in seconds</Description>
-					<Value Type="uint8" Default="10" Min="01" Max="255"/>
+					<Value Type="uint8" Default="10" Min="01" Max="FF"/>
 				</Parameter>
 				<Parameter Id="15" IdName="codelock_wrongcode_timeout2_no">
 					<Description>Wrong Code Timeout 2 No. of wrong codes (0: disabled, must be greater than Timeout 1)</Description>
 					<Value Type="uint8" Default="05" Min="00" Max="20"/>
 				</Parameter>
 				<Parameter Id="16" IdName="codelock_wrongcode_timeout2_time">
-					<Description>Wrong Code Timeout 2 duration in seconds</Description>
-					<Value Type="uint8" Default="10" Min="01" Max="255"/>
+					<Description>Wrong Code Timeout 2 duration in minutes</Description>
+					<Value Type="uint8" Default="10" Min="01" Max="FF"/>
 				</Parameter>
 				<Parameter Id="17" IdName="codelock_keypress_timeout_time">
 					<Description>Reset Code after not pressing any key for x seconds (0: disabled)</Description>
-					<Value Type="uint8" Default="5"/>
+					<Value Type="uint8" Default="05"/>
 				</Parameter>
 			</ParameterGroup>
 			
@@ -111,61 +111,61 @@
                 <Name>Command 0</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="1" IdName="cmd1_out">
                 <Name>Command 1</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="2" IdName="cmd2_out">
                 <Name>Command 2</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="3" IdName="cmd3_out">
                 <Name>Command 3</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="4" IdName="cmd4_out">
                 <Name>Command 4</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="5" IdName="cmd5_out">
                 <Name>Command 5</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="6" IdName="cmd6_out">
                 <Name>Command 6</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="7" IdName="cmd7_out">
                 <Name>Command 7</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="8" IdName="cmd8_out">
                 <Name>Command 8</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			<CommObject Id="9" IdName="cmd9_out">
                 <Name>Command 9</Name>
                 <Function>Codelock</Function>
                 <DataPointType>1.001</DataPointType>
-                <Flags>62</Flags> <!-- KLSÜA -->
+                <Flags>60</Flags> <!-- KLSÜ- -->
             </CommObject>
 			
 			<!-- sends 1 when wrong code is inserted -->
@@ -229,6 +229,23 @@
 			<ParameterDependency ParamId="19" Test="ne" TestParamId="0" TestValue="03"/>
 			<ParameterDependency ParamId="20" Test="ne" TestParamId="0" TestValue="03"/>
 			<ParameterDependency ParamId="21" Test="ne" TestParamId="0" TestValue="03"/>
+			<ParameterDependency ParamId="1" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="2" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="3" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="4" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="5" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="6" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="7" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="8" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="9" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="10" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="11" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="12" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="13" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="14" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="15" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="16" Test="ne" TestParamId="0" TestValue="00"/>
+			<ParameterDependency ParamId="17" Test="ne" TestParamId="0" TestValue="00"/>
             <ParameterGroupDependency ParamGroupId="1" Test="le" TestParamId="0" TestValue="02"/>
 			<ParameterGroupDependency ParamGroupId="2" Test="ge" TestParamId="0" TestValue="02"/>
 			

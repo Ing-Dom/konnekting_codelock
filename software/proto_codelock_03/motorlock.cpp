@@ -9,15 +9,15 @@ Motorlock::Motorlock(Beep *a_open, Beep *a_lock, Beep *a_unlock)
 
 void Motorlock::Open()
 {
-	m_open->SingleBeep(300);
+	m_open->SingleBeep(MOTORLOCK_EMULATED_KEYPRESS_TIME);
 }
 
 void Motorlock::Lock()
 {
-	m_lock->SingleBeep(300);
+	m_lock->SingleBeep(MOTORLOCK_EMULATED_KEYPRESS_TIME);
 }
 
 void Motorlock::Unlock()
 {
-	m_unlock->SingleBeep(300);
+	m_unlock->SingleBeep(MOTORLOCK_EMULATED_KEYPRESS_TIME);
 }

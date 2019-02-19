@@ -1,5 +1,3 @@
-#pragma once
-
 #define MANUFACTURER_ID 7337
 #define DEVICE_ID 20
 #define REVISION 0
@@ -34,10 +32,15 @@
 #define PARAM_cmd7_out_mode 10
 #define PARAM_cmd8_out_mode 11
 #define PARAM_cmd9_out_mode 12
-#define PARAM_motorlock_onclose 13
-#define PARAM_motorlock_open_cmd 14
-#define PARAM_motorlock_lock_cmd 15
-#define PARAM_motorlock_unlock_cmd 16
+#define PARAM_codelock_wrongcode_timeout1_no 13
+#define PARAM_codelock_wrongcode_timeout1_time 14
+#define PARAM_codelock_wrongcode_timeout2_no 15
+#define PARAM_codelock_wrongcode_timeout2_time 16
+#define PARAM_codelock_keypress_timeout_time 17
+#define PARAM_motorlock_onclose 18
+#define PARAM_motorlock_open_cmd 19
+#define PARAM_motorlock_lock_cmd 20
+#define PARAM_motorlock_unlock_cmd 21
         
 KnxComObject KnxDevice::_comObjectsList[] = {
     /* Index 0 - cmd0_out */ KnxComObject(KNX_DPT_1_001, 0x3e),
@@ -74,9 +77,14 @@ byte KonnektingDevice::_paramSizeList[] = {
     /* Index 10 - cmd7_out_mode */ PARAM_UINT8,
     /* Index 11 - cmd8_out_mode */ PARAM_UINT8,
     /* Index 12 - cmd9_out_mode */ PARAM_UINT8,
-    /* Index 13 - motorlock_onclose */ PARAM_UINT8,
-    /* Index 14 - motorlock_open_cmd */ PARAM_UINT8,
-    /* Index 15 - motorlock_lock_cmd */ PARAM_UINT8,
-    /* Index 16 - motorlock_unlock_cmd */ PARAM_UINT8
+    /* Index 13 - codelock_wrongcode_timeout1_no */ PARAM_UINT8,
+    /* Index 14 - codelock_wrongcode_timeout1_time */ PARAM_UINT8,
+    /* Index 15 - codelock_wrongcode_timeout2_no */ PARAM_UINT8,
+    /* Index 16 - codelock_wrongcode_timeout2_time */ PARAM_UINT8,
+    /* Index 17 - codelock_keypress_timeout_time */ PARAM_UINT8,
+    /* Index 18 - motorlock_onclose */ PARAM_UINT8,
+    /* Index 19 - motorlock_open_cmd */ PARAM_UINT8,
+    /* Index 20 - motorlock_lock_cmd */ PARAM_UINT8,
+    /* Index 21 - motorlock_unlock_cmd */ PARAM_UINT8
 };
 const byte KonnektingDevice::_numberOfParams = sizeof (_paramSizeList); // do not change this code

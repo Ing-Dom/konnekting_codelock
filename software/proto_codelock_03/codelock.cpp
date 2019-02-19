@@ -1,9 +1,20 @@
 #include "codelock.h"
 
-Codelock::Codelock(Beep *a_beeper, unsigned long param_code)
+Codelock::Codelock(Beep *a_beeper, unsigned long param_code,
+                    unsigned short param_codelock_wrongcode_timeout1_no,
+                    unsigned short param_codelock_wrongcode_timeout1_time,
+                    unsigned short param_codelock_wrongcode_timeout2_no,
+                    unsigned short param_codelock_wrongcode_timeout2_time,
+                    unsigned short param_codelock_keypress_timeout_time)
 {
 	m_beeper = a_beeper;
 	m_param_code = param_code;
+	m_param_codelock_wrongcode_timeout1_no = param_codelock_wrongcode_timeout1_no;
+	m_param_codelock_wrongcode_timeout1_time = param_codelock_wrongcode_timeout1_time;
+	m_param_codelock_wrongcode_timeout2_no = param_codelock_wrongcode_timeout2_no;
+	m_param_codelock_wrongcode_timeout2_time = param_codelock_wrongcode_timeout2_time;
+	m_param_codelock_keypress_timeout_time = param_codelock_keypress_timeout_time;
+  
 }
 
 void Codelock::addEventListener(void (*listener)(int))
@@ -39,15 +50,15 @@ void Codelock::KeyPress(char key)
 	int oldstate = m_state;
 	if(m_blocked_cntdown > 0)
 	{
-		m_beeper->DoubleBeep(500,200,500); // Error-Beep
+		BeepError();
 	}
 	else if(m_state == 0 || m_state == 1)
 	{
 		m_code += key;
-		m_insert_timeout_cntdown = TICKS_PER_SECOND * 5; // 5 sec
+		m_insert_timeout_cntdown = TICKS_PER_SECOND * m_param_codelock_keypress_timeout_time;
 		if(IsValidCode())
 		{
-			m_beeper->SingleBeep(1000); // ValidCode-Beep
+			BeepCodeOK();
 			ExecuteCode();
 			m_state = 0;
 			m_code = "";
@@ -57,7 +68,7 @@ void Codelock::KeyPress(char key)
 		{
 			if(m_code.length() >= CODE_LENGTH + 2)
 			{
-				m_beeper->DoubleBeep(500,200,500); // Error-Beep
+				BeepError();
 				WrongCode();
 				m_state = 0;
 				m_code = "";
@@ -65,7 +76,7 @@ void Codelock::KeyPress(char key)
 			}
 			else
 			{
-				m_beeper->SingleBeep(50); // Validkeypressed-Beep
+				BeepKeypress();
 				m_state = 1;
 				Debug.println(F("codelock %d=>%d"),oldstate,m_state);
 			}
@@ -143,8 +154,22 @@ void Codelock::WrongCode()
 	m_insert_timeout_cntdown = 0;
 
 	if(m_no_wrong_codes > 5)
-		m_blocked_cntdown = TICKS_PER_SECOND * 15 * 60; // 15min
+		m_blocked_cntdown = TICKS_PER_SECOND * 60 * m_param_codelock_wrongcode_timeout2_time;
 	else if(m_no_wrong_codes > 3)
-		m_blocked_cntdown = TICKS_PER_SECOND * 10; // 10sec
+		m_blocked_cntdown = TICKS_PER_SECOND * m_param_codelock_wrongcode_timeout1_time;
 }
 
+void Codelock::BeepKeypress()
+{
+	m_beeper->SingleBeep(BEEP_LENGTH_KEYPRESS);
+}
+
+void Codelock::BeepCodeOK()
+{
+	m_beeper->SingleBeep(1000);
+}
+
+void Codelock::BeepError()
+{
+	m_beeper->DoubleBeep(500,200,500);
+}

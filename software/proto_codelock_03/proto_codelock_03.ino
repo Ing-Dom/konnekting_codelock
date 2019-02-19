@@ -1,12 +1,8 @@
 /*
 
 ToDo:
-Flags XML
-Beep-Codes
-timeouts as params
-codelock as keypad-param 
+hide CO 0-11 when keypad mode 0
 */
-
 
 
 
@@ -78,6 +74,13 @@ unsigned short param_motorlock_onclose;
 unsigned short param_motorlock_open_cmd;
 unsigned short param_motorlock_lock_cmd;
 unsigned short param_motorlock_unlock_cmd;
+unsigned short param_codelock_wrongcode_timeout1_no;
+unsigned short param_codelock_wrongcode_timeout1_time;
+unsigned short param_codelock_wrongcode_timeout2_no;
+unsigned short param_codelock_wrongcode_timeout2_time;
+unsigned short param_codelock_keypress_timeout_time;
+	
+
 
 // ################################################
 // ### KONNEKTING Configuration
@@ -166,7 +169,10 @@ void keypadEvent(KeypadEvent key)
     //Debug.println(F("keyevent %d"),key);
     #endif
     Knx.write(COMOBJ_key_output, (unsigned short)key);
-    g_codelock->KeyPress(key);
+    if(param_device_mode == 1 || param_device_mode == 2)
+      g_codelock->KeyPress(key);
+    else if(param_device_mode =0 0)
+      g_beep->SingleBeep(BEEP_LENGTH_KEYPRESS);
   }   
 }
 
@@ -235,7 +241,7 @@ void setup()
   while (!DEBUGSERIAL)
 
   // make debug serial port known to debug class
-  // Means: KONNEKTING will sue the same serial port for console debugging
+  // Means: KONNEKTING will use the same serial port for console debugging
   Debug.setPrintStream(&DEBUGSERIAL);
   #endif
 
@@ -260,8 +266,17 @@ void setup()
     param_motorlock_open_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_open_cmd);
     param_motorlock_lock_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_lock_cmd);
     param_motorlock_unlock_cmd = (unsigned short)Konnekting.getUINT8Param(PARAM_motorlock_unlock_cmd);
+    param_codelock_wrongcode_timeout1_no = (unsigned short)Konnekting.getUINT8Param(PARAM_codelock_wrongcode_timeout1_no);
+    param_codelock_wrongcode_timeout1_time = (unsigned short)Konnekting.getUINT8Param(PARAM_codelock_wrongcode_timeout1_time);
+    param_codelock_wrongcode_timeout2_no = (unsigned short)Konnekting.getUINT8Param(PARAM_codelock_wrongcode_timeout2_no);
+    param_codelock_wrongcode_timeout2_time = (unsigned short)Konnekting.getUINT8Param(PARAM_codelock_wrongcode_timeout2_time);
+    param_codelock_keypress_timeout_time = (unsigned short)Konnekting.getUINT8Param(PARAM_codelock_keypress_timeout_time);
+
+
     
-    g_codelock = new Codelock(&g_beep, param_code);
+    g_codelock = new Codelock(&g_beep, param_code, param_codelock_wrongcode_timeout1_no, param_codelock_wrongcode_timeout1_time,
+                              param_codelock_wrongcode_timeout2_no, param_codelock_wrongcode_timeout2_time,
+                              param_codelock_keypress_timeout_time);
     g_motorlock = new Motorlock(&g_open, &g_lock, &g_unlock);
 
     timeslice_setup();
