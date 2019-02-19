@@ -3,7 +3,7 @@
 #include "config.h"
 #include "beep.h"
 
-#define MOTORLOCK_EMULATED_KEYPRESS_TIME 800
+#define MOTORLOCK_EMULATED_KEYPRESS_TIME 1200
 
 
 class Motorlock

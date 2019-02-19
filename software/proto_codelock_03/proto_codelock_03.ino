@@ -171,8 +171,8 @@ void keypadEvent(KeypadEvent key)
     Knx.write(COMOBJ_key_output, (unsigned short)key);
     if(param_device_mode == 1 || param_device_mode == 2)
       g_codelock->KeyPress(key);
-    else if(param_device_mode =0 0)
-      g_beep->SingleBeep(BEEP_LENGTH_KEYPRESS);
+    else if(param_device_mode == 0)
+      g_beep.SingleBeep(BEEP_LENGTH_KEYPRESS);
   }   
 }
 
