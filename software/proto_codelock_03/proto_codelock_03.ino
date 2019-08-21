@@ -18,6 +18,16 @@ hide CO 0-11 when keypad mode 0
 #include "timeslice.h"
 #include "beep.h"
 #include "motorlock.h"
+#include <Adafruit_DotStar.h>
+
+
+
+// There is only one pixel on the board
+
+
+
+
+
 
 // ################################################
 // ### DEBUG CONFIGURATION
@@ -38,9 +48,14 @@ hide CO 0-11 when keypad mode 0
 
 #define BEEP_PIN 2
 
-#define OPEN_PIN A0
-#define LOCK_PIN A1
-#define UNLOCK_PIN A2
+#define OPEN_PIN SCK
+#define LOCK_PIN MOSI
+#define UNLOCK_PIN MISO
+
+//Use these pin definitions for the ItsyBitsy M0
+#define DATAPIN    41
+#define CLOCKPIN   40
+#define NUMPIXELS   1
 
 // ################################################
 // ### Global variables, sketch related
@@ -79,8 +94,9 @@ unsigned short param_codelock_wrongcode_timeout1_time;
 unsigned short param_codelock_wrongcode_timeout2_no;
 unsigned short param_codelock_wrongcode_timeout2_time;
 unsigned short param_codelock_keypress_timeout_time;
-	
 
+//Dotstar LED
+Adafruit_DotStar px(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
 // ################################################
 // ### KONNEKTING Configuration
@@ -234,11 +250,20 @@ void ExecuteCodelockCmd(int cmd)
 
 void setup()
 {
+  px.begin(); // Initialize pins for output
+  px.show();  // Turn all LEDs off ASAP
+  px.setPixelColor(0, 255, 0, 0); // red
+  px.show();
+
+
   // debug related stuff
   #ifdef KDEBUG
   // Start debug serial with 9600 bauds
   DEBUGSERIAL.begin(9600);
   while (!DEBUGSERIAL)
+
+  px.setPixelColor(0, 0, 0, 255); // blue
+  px.show();
 
   // make debug serial port known to debug class
   // Means: KONNEKTING will use the same serial port for console debugging
@@ -252,6 +277,7 @@ void setup()
 
 
   g_beep.Setup();
+
 
   // Initialize KNX enabled Arduino Board
   Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
@@ -297,9 +323,11 @@ void loop()
     }
 }
 
+bool val = true;
 void T1() // 1ms
 {
-
+  digitalWrite(BEEP_PIN,val);
+  val = !val;
 }
 void T2() // 5ms
 {
