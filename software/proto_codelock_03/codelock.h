@@ -3,7 +3,7 @@
 #include "config.h"
 #include <Key.h>
 #include <Keypad.h>
-#include "beep.h"
+#include "beep_f.h"
 
 #define TICKS_PER_SECOND 40
 
@@ -13,7 +13,7 @@ class Codelock
 	private: int m_state = 0;
 	private: String m_code = "";
 	private: char m_cmdno = 0;
-  private: Beep *m_beeper;
+  private: Beep_F *m_beeper;
   private: unsigned long m_param_code = 0;
   private: unsigned short m_param_codelock_wrongcode_timeout1_no = 0;
   private: unsigned short m_param_codelock_wrongcode_timeout1_time = 0;
@@ -25,7 +25,7 @@ class Codelock
 	private: unsigned long m_insert_timeout_cntdown = 0;
 
 	//constructors
-	public: Codelock(Beep *a_beeper, unsigned long param_code,
+	public: Codelock(Beep_F *a_beeper, unsigned long param_code,
                     unsigned short param_codelock_wrongcode_timeout1_no,
                     unsigned short param_codelock_wrongcode_timeout1_time,
                     unsigned short param_codelock_wrongcode_timeout2_no,

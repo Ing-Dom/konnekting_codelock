@@ -87,4 +87,4 @@ byte KonnektingDevice::_paramSizeList[] = {
     /* Index 20 - motorlock_lock_cmd */ PARAM_UINT8,
     /* Index 21 - motorlock_unlock_cmd */ PARAM_UINT8
 };
-const byte KonnektingDevice::_numberOfParams = sizeof (_paramSizeList); // do not change this code
+const int KonnektingDevice::_numberOfParams = sizeof (_paramSizeList); // do not change this code

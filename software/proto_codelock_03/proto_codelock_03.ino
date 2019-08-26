@@ -2,9 +2,16 @@
 
 ToDo:
 hide CO 0-11 when keypad mode 0
+Factory Mode (set IA ? or has already one)
 */
 
 
+
+// Developed with Library Versions:
+//
+// KONNEKTING_Device_Library: 1.0.0-BETA4b
+// Adafriut_Dotstar: 1.1.2
+// Adafriut_SPIFlash: 1.0.8
 
 #include <KonnektingDevice.h>
 // include device related configuration code, created by "KONNEKTING CodeGenerator"
@@ -17,13 +24,9 @@ hide CO 0-11 when keypad mode 0
 #include "config.h"
 #include "timeslice.h"
 #include "beep.h"
+#include "beep_f.h"
 #include "motorlock.h"
 #include <Adafruit_DotStar.h>
-
-
-
-// There is only one pixel on the board
-
 
 
 
@@ -44,15 +47,15 @@ hide CO 0-11 when keypad mode 0
 // ### IO Configuration
 // ################################################
 #define PROG_LED_PIN 13
-#define PROG_BUTTON_PIN 7
+#define PROG_BUTTON_PIN NONE
 
-#define BEEP_PIN 2
+#define BEEP_PIN A2
 
-#define OPEN_PIN SCK
-#define LOCK_PIN MOSI
-#define UNLOCK_PIN MISO
+#define OPEN_PIN MISO
+#define LOCK_PIN 2
+#define UNLOCK_PIN 9
 
-//Use these pin definitions for the ItsyBitsy M0
+//Use these pin definitions for the ItsyBitsy M0 Dotstar LED
 #define DATAPIN    41
 #define CLOCKPIN   40
 #define NUMPIXELS   1
@@ -68,11 +71,11 @@ char keys[rows][cols] = {
   {'7','8','9'},
   {'*','0','#'}
 };
-byte rowPins[rows] = {9, 10, 11, 12}; //connect to the row pinouts of the keypad
-byte colPins[cols] = {A5, A4, A3}; //connect to the column pinouts of the keypad
+byte rowPins[rows] = {A4, A0, A5, A1}; //connect to the row pinouts of the keypad
+byte colPins[cols] = {SCK, A3, MOSI}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
 
-Beep g_beep = Beep(BEEP_PIN);
+Beep_F g_beep = Beep_F(BEEP_PIN);
 Beep g_open = Beep(OPEN_PIN);
 Beep g_lock = Beep(LOCK_PIN);
 Beep g_unlock = Beep(UNLOCK_PIN);
@@ -80,6 +83,7 @@ Codelock *g_codelock;
 Motorlock *g_motorlock;
 bool g_door_openclose = 0;
 unsigned int g_door_openclose_cntdown = 0;
+unsigned long g_progkey_pressed_ms = 0;
 
 unsigned short param_device_mode; 
 unsigned long param_code;
@@ -96,7 +100,7 @@ unsigned short param_codelock_wrongcode_timeout2_time;
 unsigned short param_codelock_keypress_timeout_time;
 
 //Dotstar LED
-Adafruit_DotStar px(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
+Adafruit_DotStar px(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BGR);
 
 // ################################################
 // ### KONNEKTING Configuration
@@ -106,17 +110,17 @@ Adafruit_DotStar px(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
 
 //FlashStorage
-int readMemory(int index)
+byte readMemory(int index)
 {
     Debug.println(F("FLASH read on index %d"),index);
     return FileEEPROM.read(index);
 }
-void writeMemory(int index, int val)
+void writeMemory(int index, byte val)
 {
     Debug.println(F("FLASH write value %d on index %d"),val, index);
     FileEEPROM.write(index, val);
 }
-void updateMemory(int index, int val)
+void updateMemory(int index, byte val)
 {
     Debug.println(F("FLASH update"));
     if (FileEEPROM.read(index) != val) {
@@ -127,6 +131,16 @@ void commitMemory()
 {
     Debug.println(F("FLASH commit"));
     FileEEPROM.commit();
+}
+
+// ################################################
+// ### set ProgLED status
+// ################################################
+//this function is used to indicate programming mode.
+//you can use LED, LCD display or what ever you want...
+void progLed(bool state)
+{
+    digitalWrite(PROG_LED_PIN, state);
 }
 
 // ################################################
@@ -177,19 +191,34 @@ void knxEvents(byte index)
   }
 }
 
+
 void keypadEvent(KeypadEvent key)
 {
-  if(keypad.getState() == PRESSED)
+  if(keypad.getState() == RELEASED)
   {
     #ifdef KDEBUG  
     //Debug.println(F("keyevent %d"),key);
     #endif
+    if(key == PROGKEY && g_progkey_pressed_ms != 0 && g_progkey_pressed_ms + PROGMODEMS < millis())
+    {
+      px.setPixelColor(0, 100, 0, 0); // green
+      px.show();
+      g_beep.SingleBeep(BEEP_LENGTH_PROGMODE);
+      Konnekting.toggleProgState();
+      return;
+    }
+
+
     Knx.write(COMOBJ_key_output, (unsigned short)key);
     if(param_device_mode == 1 || param_device_mode == 2)
       g_codelock->KeyPress(key);
     else if(param_device_mode == 0)
       g_beep.SingleBeep(BEEP_LENGTH_KEYPRESS);
-  }   
+  }
+  else if(keypad.getState() == PRESSED && key == PROGKEY)
+  {
+    g_progkey_pressed_ms = millis();
+  }
 }
 
 void codelockEvent(int cmd)
@@ -252,7 +281,7 @@ void setup()
 {
   px.begin(); // Initialize pins for output
   px.show();  // Turn all LEDs off ASAP
-  px.setPixelColor(0, 255, 0, 0); // red
+  px.setPixelColor(0, 50, 0, 0); // red
   px.show();
 
 
@@ -262,7 +291,7 @@ void setup()
   DEBUGSERIAL.begin(9600);
   while (!DEBUGSERIAL)
 
-  px.setPixelColor(0, 0, 0, 255); // blue
+  px.setPixelColor(0, 0, 0, 50); // blue
   px.show();
 
   // make debug serial port known to debug class
@@ -277,10 +306,20 @@ void setup()
 
 
   g_beep.Setup();
+  g_open.Setup();
+  g_lock.Setup();
+  g_unlock.Setup();
+
+  keypad.addEventListener(keypadEvent); //add an event listener for the keypad
 
 
   // Initialize KNX enabled Arduino Board
-  Konnekting.init(KNX_SERIAL, PROG_BUTTON_PIN, PROG_LED_PIN, MANUFACTURER_ID, DEVICE_ID, REVISION);
+    Konnekting.init(KNX_SERIAL,
+                    &progLed,
+                    MANUFACTURER_ID,
+                    DEVICE_ID,
+                    REVISION);
+  
   if (!Konnekting.isFactorySetting())
   {
     param_device_mode = (unsigned short)Konnekting.getUINT8Param(PARAM_device_mode);
@@ -305,10 +344,18 @@ void setup()
                               param_codelock_keypress_timeout_time);
     g_motorlock = new Motorlock(&g_open, &g_lock, &g_unlock);
 
-    timeslice_setup();
-    keypad.addEventListener(keypadEvent); //add an event listener for this keypad
     g_codelock->addEventListener(codelockEvent);
   }
+  else
+  {
+      px.setPixelColor(0, 0, 50, 0); // green
+      px.show();
+      writeMemory(0,  0x7F);
+      writeMemory(1,  (byte)(0xFFFF >> 8)); // 15.15.255
+      writeMemory(2,  (byte)(0xFFFF)); // 15.15.255
+      commitMemory();
+  }
+  timeslice_setup();
   Debug.println(F("Setup is ready. go to loop..."));
 
 }
@@ -316,23 +363,21 @@ void setup()
 void loop()
 {
     Knx.task();
-    
+    timeslice_scheduler();
+
     if (Konnekting.isReadyForApplication())
     {
-      timeslice_scheduler();
+      
     }
 }
 
-bool val = true;
 void T1() // 1ms
 {
-  digitalWrite(BEEP_PIN,val);
-  val = !val;
+  g_beep.Cyclic();
 }
 void T2() // 5ms
 {
   keypad.getKey();
-  g_beep.Cyclic();
   g_open.Cyclic();
   g_lock.Cyclic();
   g_unlock.Cyclic();
