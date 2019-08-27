@@ -1,7 +1,7 @@
 /*
 
 ToDo:
-hide CO 0-11 when keypad mode 0
+hide CO 0-11 when keypad mode 0 (no solution with BETA4b)
 Factory Mode (set IA ? or has already one)
 */
 
