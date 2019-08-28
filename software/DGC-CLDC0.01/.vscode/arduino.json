@@ -1,0 +1,6 @@
+{
+    "board": "adafruit:samd:adafruit_itsybitsy_m0",
+    "sketch": "DGC-CLDC0.01.ino",
+    "port": "COM14",
+    "output": "../build"
+}

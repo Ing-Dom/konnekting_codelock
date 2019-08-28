@@ -20,12 +20,21 @@ Beep with Frequency
 //
 // KONNEKTING_Device_Library: 1.0.0-BETA4b
 // Adafriut_Dotstar: 1.1.2
-// Adafriut_SPIFlash: 1.0.8
+// Adafriut_SPIFlash: 1.0.8 / 1.1.0
+// Keypad: 3.1.1
 //
 // Other Versions:
 // Arduino IDE: 1.8.8
 // Boardmanager Arduino SAMD Boards: 1.8.3
-// Boardmanager Adafruit SAMD Boards:
+// Boardmanager Adafruit SAMD Boards: 1.5.3
+
+/* DotStar RBG LED Color definitions
+
+red:    Waiting for establishing Debug Connection USB-Serial
+blue:   FactoryMode - Programm with Konnekting Suite
+green:  Normale Mode
+cyan:   Normale Mode with Serial Debug
+*/
 
 #include <KonnektingDevice.h>
 // include device related configuration code, created by "KONNEKTING CodeGenerator"
@@ -100,8 +109,8 @@ bool g_door_openclose = 0;
 unsigned int g_door_openclose_cntdown = 0;
 unsigned long g_progkey_pressed_ms = 0;
 
-unsigned short param_device_mode; 
-unsigned long param_code;
+unsigned short param_device_mode = 0; 
+unsigned long param_code = 0;
 unsigned short param_default_cmd;
 unsigned short param_cmd_out_mode[10];
 unsigned short param_motorlock_onclose;
@@ -216,8 +225,6 @@ void keypadEvent(KeypadEvent key)
     #endif
     if(key == PROGKEY && g_progkey_pressed_ms != 0 && g_progkey_pressed_ms + PROGMODEMS < millis())
     {
-      px.setPixelColor(0, 100, 0, 0); // green
-      px.show();
       g_beep.SingleBeep(BEEP_LENGTH_PROGMODE);
       Konnekting.toggleProgState();
       return;
@@ -294,6 +301,7 @@ void ExecuteCodelockCmd(int cmd)
 
 void setup()
 {
+
   px.begin(); // Initialize pins for output
   px.show();  // Turn all LEDs off ASAP
   px.setPixelColor(0, 50, 0, 0); // red
@@ -305,9 +313,6 @@ void setup()
   // Start debug serial with 9600 bauds
   DEBUGSERIAL.begin(9600);
   while (!DEBUGSERIAL)
-
-  px.setPixelColor(0, 0, 0, 50); // blue
-  px.show();
 
   // make debug serial port known to debug class
   // Means: KONNEKTING will use the same serial port for console debugging
@@ -360,11 +365,18 @@ void setup()
     g_motorlock = new Motorlock(&g_open, &g_lock, &g_unlock);
 
     g_codelock->addEventListener(codelockEvent);
+    
+    #ifdef KDEBUG
+    px.setPixelColor(0, 63, 136, 143); // cyan
+    #else
+    px.setPixelColor(0, 0, 50, 0); // green
+    #endif
+    px.show();
   }
   else
   {
     Debug.println(F("Device is in factory mode. Starting programming mode..."));
-    px.setPixelColor(0, 0, 50, 0); // green
+    px.setPixelColor(0, 0, 0, 50); // blue
     px.show();
     Konnekting.setProgState(true);
   }
