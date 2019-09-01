@@ -54,7 +54,7 @@ cyan:   Normale Mode with Serial Debug
 // ################################################
 // ### DEBUG CONFIGURATION
 // ################################################
-#define KDEBUG // comment this line to disable DEBUG mode
+//#define KDEBUG // comment this line to disable DEBUG mode
 #ifdef KDEBUG
 #include <DebugUtil.h>
 #endif
