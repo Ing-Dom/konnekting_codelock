@@ -1,6 +1,6 @@
 #include "codelock.h"
 
-Codelock::Codelock(Beep_F *a_beeper, unsigned long param_code,
+Codelock::Codelock(Beep *a_beeper, unsigned long param_code,
                     unsigned short param_codelock_wrongcode_timeout1_no,
                     unsigned short param_codelock_wrongcode_timeout1_time,
                     unsigned short param_codelock_wrongcode_timeout2_no,

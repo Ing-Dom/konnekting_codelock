@@ -1,7 +1,15 @@
 /*
 DGC-CLDC0.01 CodeLock Door Controller
-V1.0.0
+V1.0.1
+
+
+Changelog:
+
+
+V1.0.1  SirSydom  201-09-06   changed Piezo to Buzzer
+V1.0.0  SirSydom  
 */
+
 
 
 
@@ -99,7 +107,7 @@ byte colPins[cols] = {SCK, A3, MOSI}; //connect to the column pinouts of the key
 // ################################################
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, rows, cols );
-Beep_F g_beep = Beep_F(BEEP_PIN);
+Beep g_beep = Beep(BEEP_PIN);
 Beep g_open = Beep(OPEN_PIN);
 Beep g_lock = Beep(LOCK_PIN);
 Beep g_unlock = Beep(UNLOCK_PIN);
